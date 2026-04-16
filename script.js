@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logout-btn');
 
     // --- UTILITY FUNCTIONS ---
-    const getCurrencySymbol = () => currencies.find(c => c.code === state.currency)?.symbol || '$';
+    const getCurrencySymbol = (currencyCode = state.currency) => currencies.find(c => c.code === currencyCode)?.symbol || '$';
 
     // --- RENDER FUNCTIONS ---
     const renderItems = () => {
@@ -492,6 +492,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(error => console.error("Error loading invoice:", error));
     };
 
+    const deleteInvoice = (invoiceId) => {
+        if (!currentUser) {
+            alert("You must be logged in to delete an invoice.");
+            return;
+        }
+
+        if (confirm("Are you sure you want to delete this invoice? This action cannot be undone.")) {
+            db.collection('invoices').doc(invoiceId).delete()
+                .then(() => {
+                    console.log("Invoice successfully deleted!");
+                    alert("Invoice deleted successfully!");
+                    fetchAndDisplayInvoices(); // Re-fetch and display invoices to update the list
+                })
+                .catch(error => {
+                    console.error("Error removing invoice: ", error);
+                    alert("Error deleting invoice. Please check your permissions.");
+                });
+        }
+    };
+
+
     // --- FIRESTORE LOGIC ---
     const saveInvoiceBtn = document.getElementById('save-invoice-btn');
 
@@ -548,8 +569,8 @@ document.addEventListener('DOMContentLoaded', () => {
               }
               querySnapshot.forEach(doc => {
                   const invoice = doc.data();
-                  const total = invoice.items.reduce((sum, item) => sum + (item.quantity * item.rate), 0) * (1 + (invoice.vatRate / 100));
-                  tbody.innerHTML += `<tr><td>${invoice.invoiceDetails.number}</td><td>${invoice.clientInfo.name}</td><td>${invoice.invoiceDetails.date}</td><td class="alignRight">${getCurrencySymbol()}${total.toFixed(2)}</td><td><button class="button button-outline load-invoice-btn" data-id="${doc.id}">Load</button></td></tr>`;
+                  const total = invoice.items.reduce((sum, item) => sum + (item.quantity * item.rate), 0) * (1 + (invoice.vatRate / 100)); // calculate total before using currency
+                  tbody.innerHTML += `<tr><td>${invoice.invoiceDetails.number}</td><td>${invoice.clientInfo.name}</td><td>${invoice.invoiceDetails.date}</td><td class="alignRight">${getCurrencySymbol(invoice.currency)}${total.toFixed(2)}</td><td><button class="button button-outline load-invoice-btn" data-id="${doc.id}">Load</button> <button class="button button-danger delete-invoice-btn" data-id="${doc.id}">Delete</button></td></tr>`;
               });
           })
           .catch(error => {
@@ -567,6 +588,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const invoiceId = e.target.dataset.id;
             if (invoiceId) {
                 loadInvoice(invoiceId);
+            }
+        } else if (e.target && e.target.classList.contains('delete-invoice-btn')) {
+            const invoiceId = e.target.dataset.id;
+            if (invoiceId) {
+                deleteInvoice(invoiceId);
             }
         }
     });

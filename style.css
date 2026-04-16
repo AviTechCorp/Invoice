@@ -580,3 +580,14 @@ select option[data-pro="true"]::after {
     .hero-image { grid-row: 1; margin-bottom: 2rem; }
     .features-list { justify-content: center; }
 }
+
+.button-danger {
+    background-color: #dc3545; /* Red */
+    color: white;
+    border: 1px solid #dc3545;
+}
+
+.button-danger:hover {
+    background-color: #c82333; /* Darker red on hover */
+    border-color: #bd2130;
+}

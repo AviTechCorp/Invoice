@@ -53,7 +53,11 @@
                         <thead>
                             <tr><th>Invoice #</th><th>Client Name</th><th>Date</th><th class="alignRight">Amount</th><th>Actions</th></tr>
                         </thead>
-                        <tbody id="past-invoices-tbody"></tbody>
+                        <tbody id="past-invoices-tbody">
+                            <!-- Invoice rows will be dynamically inserted here -->
+                            <!-- Example row structure: -->
+                            <!-- <tr><td>INV-001</td><td>Client A</td><td>2023-01-01</td><td class="alignRight">$100.00</td><td><button class="button button-outline load-invoice-btn" data-id="invoiceId">Load</button><button class="button button-danger delete-invoice-btn" data-id="invoiceId">Delete</button></td></tr> -->
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -103,7 +107,7 @@
                         </div>
                         <div class="currencySelector">
                             <label for="currency">Currency:</label>
-                            <select id="currency" class="select select-sm"></select>
+                            <select id="currency" class="select select-sm" data-state="currency"></select>
                         </div>
                     </div>
                 </div>
