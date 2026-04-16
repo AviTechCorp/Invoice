@@ -542,7 +542,7 @@ document.addEventListener('DOMContentLoaded', () => {
           .get()
           .then(querySnapshot => {
               tbody.innerHTML = '';
-              if (querySnapshot.empty) {
+              if (!querySnapshot || querySnapshot.empty) {
                   tbody.innerHTML = '<tr><td colspan="5">No past invoices found.</td></tr>';
                   return;
               }
@@ -551,6 +551,10 @@ document.addEventListener('DOMContentLoaded', () => {
                   const total = invoice.items.reduce((sum, item) => sum + (item.quantity * item.rate), 0) * (1 + (invoice.vatRate / 100));
                   tbody.innerHTML += `<tr><td>${invoice.invoiceDetails.number}</td><td>${invoice.clientInfo.name}</td><td>${invoice.invoiceDetails.date}</td><td class="alignRight">${getCurrencySymbol()}${total.toFixed(2)}</td><td><button class="button button-outline load-invoice-btn" data-id="${doc.id}">Load</button></td></tr>`;
               });
+          })
+          .catch(error => {
+              console.error("Error fetching invoices: ", error);
+              tbody.innerHTML = '<tr><td colspan="5" style="color: red;">Error loading invoices. Please check your permissions or connection.</td></tr>';
           });
     };
 
